@@ -14,10 +14,13 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 
-logging.basicConfig(level=logging.INFO)
+import os
+from dotenv import load_dotenv
 
-# === YOUR BOT TOKEN (FROM @BotFather) ===
-TELEGRAM_TOKEN = '8219588841:AAGIsrHpjLGCaxJ_x9gHSOJ5Fm2rmOoEUEc'   # ← CHANGE THIS
+load_dotenv()  # Load .env file (for local testing only)
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')  # ← NOW SECURE!
+
+logging.basicConfig(level=logging.INFO)
 
 # === LOGIC #1: 4+ GOALS ===
 GOALS_PATTERN = {
