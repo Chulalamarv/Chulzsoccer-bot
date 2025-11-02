@@ -447,3 +447,24 @@ def main():
 if __name__ == '__main__':
     main()
 
+# === FAKE WEB SERVER FOR RENDER (FREE TIER) ===
+from flask import Flask
+import threading
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Chulzsoccer-bot is running 24/7! Signals active."
+
+def run_flask():
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
+
+# Start Flask in background
+flask_thread = threading.Thread(target=run_flask, daemon=True)
+flask_thread.start()
+
+if __name__ == '__main__':
+    main()
+
+
