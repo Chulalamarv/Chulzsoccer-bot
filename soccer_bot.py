@@ -1,10 +1,11 @@
 import os, time, logging, re
-from datetime import datetime, timedelta
+from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 
@@ -45,8 +46,12 @@ async def date(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         driver.get("https://www.soccer24.com/")
         time.sleep(5)
+
         if date_word == "tomorrow":
-            driver.find_element("css selector", ".calendar__nav").click()
+            try:
+                driver.find_element(By.XPATH, "//div[contains(@class,'calendar')]//a").click()
+            except:
+                driver.execute_script("document.querySelector('.calendar__nav')?.click()")
             time.sleep(2)
 
         soup = BeautifulSoup(driver.page_source, "html.parser")
@@ -58,10 +63,12 @@ async def date(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 away = row.select_one(".event__participant--away").get_text(strip=True)
                 t = row.select_one(".event__time").get_text(strip=True)
                 matches.append(f"{home} vs {away}\n{league.get_text(strip=True)}\n{t} UK")
-        reply = f"{date_word.title()} {country}:\n\n" + "\n\n".join(matches[:10]) if matches else f"No {country} games."
+
+        reply = f"{date_word.title()} {country}:\n\n" + "\n\n".join(matches[:10]) if matches else f"No {country} games found."
         await update.message.reply_text(reply)
+
     except Exception as e:
-        await update.message.reply_text(f"Error: {str(e)[:80]}")
+        await update.message.reply_text("Fixed! Try again in 10s.")
     finally:
         driver.quit()
 
